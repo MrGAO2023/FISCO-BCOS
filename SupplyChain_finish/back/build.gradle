@@ -1,0 +1,96 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://maven.aliyun.com/nexus/content/groups/public/"}
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        mavenLocal()
+
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.1.RELEASE")
+    }
+}
+plugins {
+    id 'org.springframework.boot' version '2.1.1.RELEASE'
+}
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+group = 'org.example'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://maven.aliyun.com/nexus/content/groups/public/"}
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://dl.bintray.com/ethereum/maven/" }
+    maven { url "https://oss.sonatype.org/service/local/staging/deploy/maven2"}
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    all {
+    }
+}
+
+dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.slf4j:slf4j-api:1.7.5'
+    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    implementation ('org.fisco-bcos.java-sdk:fisco-bcos-java-sdk:2.8.0') {
+        exclude group: 'org.slf4j'
+    }
+    implementation 'io.springfox:springfox-swagger2:2.6.1'
+    implementation 'io.springfox:springfox-swagger-ui:2.6.1'
+    implementation 'cn.hutool:hutool-all:5.7.9'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.5.3'
+    implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.29'
+
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources  {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+test {
+    useJUnitPlatform()
+}
+bootJar {
+    destinationDir file('dist')
+    archiveName project.name + '-exec.jar'
+    doLast {
+        copy {
+            from file('src/main/resources')
+            into 'dist'
+        }
+    }
+}
+
+clean {
+    println "delete ${projectDir}/dist"
+    delete "${projectDir}/dist"
+}
